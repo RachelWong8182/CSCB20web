@@ -16,16 +16,6 @@ body{
     object-fit: cover;
 }
 
-#button1{
-    width: 100px;
-    height: 45px;
-    font-size: 20px;
-    background-color:#4f6b5a;
-    color:white;
-    border: none;
-    border-radius: 15px;
-}
-
 .login-popup-window{
     display: none;
 }
@@ -38,16 +28,6 @@ body{
     margin:auto;
 }
 
-#searchbox{
-    width: 450px;
-    height: 45px;
-    border: none;
-    border-radius: 16px;
-    background: #d7d7cb;
-    padding: 14px;
-    margin-bottom: 20px;
-}
-
 .titleline{
     display: flex;
     flex-direction: row;
@@ -57,6 +37,32 @@ body{
     margin-bottom:40px;
     margin-top:40px;
 }
+
+#searchbox{
+    width: 450px;
+    height: 45px;
+    border: none;
+    border-radius: 16px;
+    background: #d7d7cb;
+    padding: 14px;
+}
+#login-button {
+    border: none;
+    background: none;
+    cursor: pointer;
+    padding: 0; 
+    position: absolute;
+    right: 40px;
+}
+
+
+#login-button img {
+    width: 45px;
+    height: 45px;
+    object-fit: cover;
+    vertical-align: middle; 
+}
+
 
 /* ===== Popup Styles ===== */
 .modal-overlay {
