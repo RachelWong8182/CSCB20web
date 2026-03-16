@@ -1,8 +1,6 @@
 /* ===== MainPage Styles ===== */
 body{
     background-color: #fdfbf7;
-    font-family: Arial, Helvetica, sans-serif;
-    color: #222;
 }
 
 .dishphoto_arrange{
@@ -23,22 +21,30 @@ body{
     display: none;
 }
 
-.titleline a{
-    position:absolute;
-    right:40px;
-    top:0px;
-    bottom:0px;
-    margin:auto;
-}
-
 .titleline{
     display: flex;
     flex-direction: row;
-    justify-content:center;
-    align-items:center;
-    position:relative;
-    margin-bottom:40px;
-    margin-top:40px;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    position: relative;
+    margin-bottom: 40px;
+    margin-top: 40px;
+    padding: 0 40px;
+}
+
+#logo-button {
+    border: none;
+    background: none;
+    cursor: pointer;
+    padding: 0;
+}
+
+#logo-button img {
+    width: 35px;
+    height: 35px;
+    object-fit: cover;
+    vertical-align: middle; 
 }
 
 #searchbox{
@@ -49,22 +55,49 @@ body{
     background: #d7d7cb;
     padding: 14px;
 }
+
+#manager-button {
+    width: 300px;
+    height: 40px;
+    border-radius: 30px;
+    border: none;
+    background: #000000;
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+
+}
+
+#likes-button {
+    border: none;
+    background: none;
+    cursor: pointer;
+    padding: 0;
+}
+
+#likes-button img {
+    width: 30px;
+    height: 30px;
+    object-fit: cover;
+    vertical-align: middle; 
+}
+
 #login-button {
     border: none;
     background: none;
     cursor: pointer;
-    padding: 0; 
-    position: absolute;
-    right: 40px;
+    padding: 0;
 }
 
 
 #login-button img {
-    width: 45px;
-    height: 45px;
+    width: 35px;
+    height: 35px;
     object-fit: cover;
     vertical-align: middle; 
 }
+
+
 
 
 /* ===== Popup Styles ===== */

@@ -9,7 +9,20 @@
 
 <body>
     <nav class="titleline">
+
+        <button name="logo_button" id="logo-button">
+            <img src="profile_icon.png" alt="profile">
+        </button>
+
         <input id="searchbox" type="search" placeholder="search for a specific restaurant...">
+
+        <button name="manager_button" id="manager-button"> I'm a restaurant manager +
+        </button>
+
+        <button name="likes_button" id="likes-button">
+            <img src="../heart.png" alt="likes">
+        </button>
+
 
         <button onclick="login_popup()" id="login-button">
             <img src="profile_icon.png" alt="profile">
@@ -32,7 +45,7 @@
 
         <section class="restaurant-list" id="restaurantList">
 
-            <button class="restaurant-card">
+            <button class="restaurant-card" data-name="Restaurant 1" data-rating="4.8" data-price="$22" data-distance="1.2">
                 <div class="restaurant-info">
                 <div class="restaurant-name">Restaurant 1</div>
                 <div class="restaurant-meta">Rating: 4.8</div>
@@ -41,7 +54,7 @@
                 </div>
             </button>
 
-            <button class="restaurant-card">
+            <button class="restaurant-card" data-name="Restaurant 2" data-rating="4.6" data-price="$18" data-distance="0.8">
                 <div class="restaurant-info">
                     <div class="restaurant-name">Restaurant 2</div>
                     <div class="restaurant-meta">Rating: 4.6</div>
@@ -50,7 +63,7 @@
                 </div>
             </button>
 
-            <button class="restaurant-card">
+            <button class="restaurant-card" data-name="Restaurant 3" data-rating="4.5" data-price="$16" data-distance="2.5">
                 <div class="restaurant-info">
                     <div class="restaurant-name">Restaurant 3</div>
                     <div class="restaurant-meta">Rating: 4.5</div>
@@ -59,7 +72,7 @@
             </div>
             </button>
 
-            <button class="restaurant-card">
+            <button class="restaurant-card" data-name="Restaurant 4" data-rating="4.7" data-price="$20" data-distance="1.9">
                 <div class="restaurant-info">
                     <div class="restaurant-name">Restaurant 4</div>
                     <div class="restaurant-meta">Rating: 4.7</div>
@@ -68,7 +81,7 @@
                 </div>
             </button>
 
-            <button class="restaurant-card">
+            <button class="restaurant-card" data-name="Restaurant 5" data-rating="4.4" data-price="$14" data-distance="3.1">
                 <div class="restaurant-info">
                     <div class="restaurant-name">Restaurant 5</div>
                     <div class="restaurant-meta">Rating: 4.4</div>
@@ -80,6 +93,7 @@
     </div>
     <div id="modal-container"></div>
     <script src="/java/login_window.js"></script>
+    <script src="/java/restaurant_listing.js"></script>
 
 </body>
 </html>
