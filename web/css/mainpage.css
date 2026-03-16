@@ -116,6 +116,11 @@ body{
     cursor: pointer;
 }
 
+.btn-register {
+    border: none;
+    background: none;
+}
+
 .btn-forget-password {
     width: 300px;
     height: 40px;

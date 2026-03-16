@@ -1,3 +1,4 @@
+  <!-- Login Form -->
 <div id="login-popup" class="modal-overlay">
     <div class="modal-box">
         <h2 class="modal-title">Welcome Back</h2>
@@ -9,5 +10,27 @@
 
         <button class="btn-login">Login</button>
         <button class="btn-forget-password" >Forget Password?</button>
+
+        <p>
+        Don't have an accont?
+        <button class="btn-register" onclick="register_popup()"> Register </button>
+        </p>
+    </div>
+</div>
+
+<!-- Register Form -->
+<div id="register-popup" class="modal-overlay">
+    <div class="modal-box">
+        <h2 class="modal-title"> Register</h2>
+
+        <button class="btn-close" onclick="document.getElementById('login-popup').style.display='none'">✕</button>
+
+        <input type="email" placeholder="email" class="modal-input">
+        <input type="password" placeholder="create password" class="modal-input">
+        <input type="password" placeholder="confirm password" class="modal-input">
+
+
+        <button class="btn-login"> Create Account </button>
+        
     </div>
 </div>
