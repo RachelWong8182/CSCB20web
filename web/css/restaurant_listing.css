@@ -49,7 +49,7 @@ body{
 
 #searchbox{
     width: 450px;
-    height: 45px;
+    height: 35px;
     border: none;
     border-radius: 16px;
     background: #d7d7cb;
@@ -58,7 +58,7 @@ body{
 
 #manager-button {
     width: 300px;
-    height: 40px;
+    height: 35px;
     border-radius: 30px;
     border: none;
     background: #000000;

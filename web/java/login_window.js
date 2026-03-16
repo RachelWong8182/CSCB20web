@@ -1,96 +1,219 @@
-// ===== LOGIN STATE =====
-let loggedIn = false;
+// ===== Load popup HTML into modal-container =====
+function login_popup() {
+    loadPopup(() => {
+        document.getElementById('login-popup').style.display = 'flex';
+    });
+}
 
+function register_popup() {
+    loadPopup(() => {
+        document.getElementById('login-popup').style.display = 'none';
+        document.getElementById('register-popup').style.display = 'flex';
+    });
+}
 
-// ===== LOGIN POPUP =====
-function login_popup(){
+function manager_login_popup() {
+    loadPopup(() => {
+        document.getElementById('manager-login-popup').style.display = 'flex';
+    });
+}
 
-    fetch('pop_up.html')
-        .then(rawfile => rawfile.text())
+function manager_register_popup() {
+    loadPopup(() => {
+        document.getElementById('manager-login-popup').style.display = 'none';
+        document.getElementById('manager-register-popup').style.display = 'flex';
+    });
+}
+
+function loadPopup(callback) {
+    const container = document.getElementById('modal-container');
+    // If already loaded, just run callback
+    if (container.innerHTML.trim() !== '') {
+        callback();
+        return;
+    }
+    fetch('/pop_up.html')
+        .then(r => r.text())
         .then(html => {
-
-            document.getElementById('modal-container').innerHTML = html;
-
-            document.getElementById('login-popup').style.display = 'flex';
-
+            container.innerHTML = html;
+            callback();
         });
-
 }
 
 
-// ===== REGISTER POPUP =====
-function register_popup(){
+// ===== Submit Login (General User) =====
+function submitLogin() {
+    const email = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-password').value.trim();
+    const errorEl = document.getElementById('login-error');
 
-    document.getElementById("login-popup").style.display = "none";
-
-    document.getElementById("register-popup").style.display = "flex";
-
-}
-
-function back_to_login(){
-
-    document.getElementById("login-popup").style.display = "flex";
-
-    document.getElementById("register-popup").style.display = "none";
-
-}
-
-
-// ===== LOGIN SUCCESS =====
-function login_success(){
-
-    loggedIn = true;
-
-    document.getElementById("login-popup").style.display = "none";
-
-}
-
-
-// ===== WAIT UNTIL PAGE LOAD =====
-window.onload = function(){
-
-    const loginButton = document.getElementById("login-button");
-
-    const settingMenu = document.getElementById("settingMenu");
-
-
-    loginButton.addEventListener("click", function(event){
-
-        event.stopPropagation();
-
-        // Guest user
-        if(!loggedIn){
-
-            login_popup();
-
-            return;
-
-        }
-
-        // Logged in user
-        if(settingMenu.style.display === "block"){
-
-            settingMenu.style.display = "none";
-
+    fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById('login-popup').style.display = 'none';
+            applySessionUI(data.role, data.email);
         } else {
-
-            settingMenu.style.display = "block";
-
+            errorEl.textContent = data.message;
+            errorEl.style.display = 'block';
         }
-
     });
-
-
-    // Close menu if click outside
-    document.addEventListener("click", function(event){
-
-        if(!loginButton.contains(event.target) &&
-           !settingMenu.contains(event.target)){
-
-            settingMenu.style.display = "none";
-
-        }
-
-    });
-
 }
+
+
+// ===== Submit Login (Manager) =====
+function submitManagerLogin() {
+    const email = document.getElementById('manager-login-email').value.trim();
+    const password = document.getElementById('manager-login-password').value.trim();
+    const errorEl = document.getElementById('manager-login-error');
+
+    fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            if (data.role !== 'manager') {
+                errorEl.textContent = 'This account is not a manager account.';
+                errorEl.style.display = 'block';
+                return;
+            }
+            document.getElementById('manager-login-popup').style.display = 'none';
+            applySessionUI(data.role, data.email);
+        } else {
+            errorEl.textContent = data.message;
+            errorEl.style.display = 'block';
+        }
+    });
+}
+
+
+// ===== Submit Register (User or Manager) =====
+function submitRegister(role) {
+    const prefix = role === 'manager' ? 'manager-register' : 'register';
+    const email = document.getElementById(`${prefix}-email`).value.trim();
+    const password = document.getElementById(`${prefix}-password`).value.trim();
+    const confirm = document.getElementById(`${prefix}-confirm`).value.trim();
+    const errorEl = document.getElementById(`${prefix}-error`);
+
+    fetch('/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, confirm_password: confirm, role })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            // Close register popup, open login popup
+            document.getElementById(`${prefix}-popup`).style.display = 'none';
+            const loginId = role === 'manager' ? 'manager-login-popup' : 'login-popup';
+            document.getElementById(loginId).style.display = 'flex';
+        } else {
+            errorEl.textContent = data.message;
+            errorEl.style.display = 'block';
+        }
+    });
+}
+
+
+// ===== Logout =====
+function logout() {
+    fetch('/api/logout', { method: 'POST' })
+        .then(() => {
+            applySessionUI(null, null);
+            // Close dropdown
+            document.getElementById('settingMenu').style.display = 'none';
+        });
+}
+
+
+// ===== Apply UI based on role =====
+// role: 'manager', 'user', or null (logged out)
+function applySessionUI(role, email) {
+    const managerBtn = document.getElementById('manager-button');
+    const loginBtn = document.getElementById('login-button');
+    const settingMenu = document.getElementById('settingMenu');
+
+    if (role === null) {
+        // Logged out — icon click opens login popup
+        if (loginBtn) loginBtn.dataset.loggedIn = 'false';
+        if (managerBtn) managerBtn.style.display = 'inline-block';
+        if (settingMenu) settingMenu.style.display = 'none';
+        return;
+    }
+
+    // Logged in — icon click toggles dropdown
+    if (loginBtn) loginBtn.dataset.loggedIn = 'true';
+
+    if (role === 'manager') {
+        if (managerBtn) managerBtn.style.display = 'none';
+    } else {
+        if (managerBtn) managerBtn.style.display = 'inline-block';
+    }
+
+    if (settingMenu) {
+        const managerLink = role === 'manager'
+            ? `<a href="/manager_dashboard.html">My Restaurant</a>`
+            : '';
+        settingMenu.innerHTML = `
+            <a href="#">Profile (${email})</a>
+            ${managerLink}
+            <a href="#" onclick="logout()">Logout</a>
+        `;
+    }
+}
+
+
+// ===== Toggle setting dropdown =====
+function toggleSettingMenu() {
+    const menu = document.getElementById('settingMenu');
+    menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', (e) => {
+    const menu = document.getElementById('settingMenu');
+    const loginBtn = document.getElementById('login-button');
+    if (menu && loginBtn && !loginBtn.contains(e.target) && !menu.contains(e.target)) {
+        menu.style.display = 'none';
+    }
+});
+
+
+// ===== Check session on page load =====
+document.addEventListener('DOMContentLoaded', () => {
+    const loginBtn = document.getElementById('login-button');
+    if (loginBtn) {
+        loginBtn.dataset.loggedIn = 'false'; // default
+        loginBtn.onclick = () => {
+            if (loginBtn.dataset.loggedIn === 'true') {
+                toggleSettingMenu();  // logged in → show dropdown
+            } else {
+                login_popup();        // not logged in → show login popup
+            }
+        };
+    }
+
+    // Wire up manager button to open manager login popup
+    const managerBtn = document.getElementById('manager-button');
+    if (managerBtn) {
+        managerBtn.onclick = manager_login_popup;
+    }
+
+    // Check existing session
+    fetch('/api/session')
+        .then(r => r.json())
+        .then(data => {
+            if (data.logged_in) {
+                applySessionUI(data.role, data.email);
+            } else {
+                applySessionUI(null, null);
+            }
+        });
+});
