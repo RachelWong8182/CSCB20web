@@ -12,8 +12,14 @@
         <input id="searchbox" type="search" placeholder="search for a specific restaurant...">
 
         <button onclick="login_popup()" id="login-button">
-        <img src="profile_icon.png" alt="profile">
+            <img src="profile_icon.png" alt="profile">
         </button>
+
+        <div id="settingMenu" class="setting-menu">
+            <a href="#">Profile</a>
+            <a href="#">Settings</a>
+            <a href="#">Logout</a>
+        </div>
     </nav>
 
     <div class="page">
@@ -72,6 +78,8 @@
             </button>
         </section>
     </div>
+    <div id="modal-container"></div>
+    <script src="/java/login_window.js"></script>
 
 </body>
 </html>
