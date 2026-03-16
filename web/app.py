@@ -10,4 +10,8 @@ def mainpage():
 def popup():
     return render_template('pop_up.html')
 
+@app.route('/restaurant_italian.html')
+def italianFood():
+    return render_template('restaurant_italian.html')
+
 app.run(debug=True)

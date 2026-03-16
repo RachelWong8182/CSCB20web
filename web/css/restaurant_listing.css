@@ -1,6 +1,8 @@
 /* ===== MainPage Styles ===== */
 body{
     background-color: #fdfbf7;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #222;
 }
 
 .dishphoto_arrange{
@@ -143,4 +145,62 @@ body{
     font-size: 18px;
     cursor: pointer;
     color: grey;
+}
+
+/* ===== Restaurant Listing Styles ===== */
+.page{
+    max-width:1000px;
+    margin:0 auto;
+}
+
+.filter-bar{
+    display:flex;
+    gap:12px;
+    background:#d7d7cb;
+    border-radius:16px;
+    padding:10px 16px;
+    margin-bottom:20px;
+}
+
+.filter-btn{
+    border:none;
+    background:transparent;
+    font-size:14px;
+    color:#222;
+    cursor:pointer;
+}
+
+.restaurant-list{
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+}
+
+.restaurant-card{
+    width:100%;
+    border:none;
+    background:#ffffff;
+    border-radius:16px;
+    padding:16px;
+    display:flex;
+    align-items:center;
+    gap:16px;
+    cursor:pointer;
+    text-align:left;
+    box-shadow:0 2px 6px rgba(0,0,0,0.08);
+}
+
+.restaurant-info{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+}
+
+.restaurant-name{
+    font-size:18px;
+    font-weight:bold;
+}
+
+.restaurant-meta{
+    font-size:14px;
 }
