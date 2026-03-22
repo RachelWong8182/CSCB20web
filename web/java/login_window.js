@@ -126,9 +126,13 @@ function submitRegister(role) {
 function logout() {
     fetch('/api/logout', { method: 'POST' })
         .then(() => {
-            applySessionUI(null, null);
-            // Close dropdown
-            document.getElementById('settingMenu').style.display = 'none';
+            // If on a manager-only page, redirect to mainpage
+            if (window.location.pathname.includes('my_restaurant')) {
+                window.location.href = '/';
+            } else {
+                applySessionUI(null, null);
+                document.getElementById('settingMenu').style.display = 'none';
+            }
         });
 }
 
