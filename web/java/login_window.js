@@ -137,33 +137,33 @@ function logout() {
 // role: 'manager', 'user', or null (logged out)
 function applySessionUI(role, email) {
     const managerBtn = document.getElementById('manager-button');
+    const myStoreBtn = document.getElementById('mystore-button');
     const loginBtn = document.getElementById('login-button');
     const settingMenu = document.getElementById('settingMenu');
 
     if (role === null) {
-        // Logged out — icon click opens login popup
+        // Logged out state
         if (loginBtn) loginBtn.dataset.loggedIn = 'false';
         if (managerBtn) managerBtn.style.display = 'inline-block';
+        if (myStoreBtn) myStoreBtn.style.display = 'none';
         if (settingMenu) settingMenu.style.display = 'none';
         return;
     }
 
-    // Logged in — icon click toggles dropdown
+    // Logged in
     if (loginBtn) loginBtn.dataset.loggedIn = 'true';
 
     if (role === 'manager') {
         if (managerBtn) managerBtn.style.display = 'none';
+        if (myStoreBtn) myStoreBtn.style.display = 'inline-block';
     } else {
         if (managerBtn) managerBtn.style.display = 'inline-block';
+        if (myStoreBtn) myStoreBtn.style.display = 'none';
     }
 
     if (settingMenu) {
-        const managerLink = role === 'manager'
-            ? `<a href="/manager_dashboard.html">My Restaurant</a>`
-            : '';
         settingMenu.innerHTML = `
             <a href="#">Profile (${email})</a>
-            ${managerLink}
             <a href="#" onclick="logout()">Logout</a>
         `;
     }

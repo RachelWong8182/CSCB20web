@@ -268,3 +268,15 @@ body{
 .restaurant-meta{
     font-size:14px;
 }
+
+#mystore-button {
+    width: 160px;
+    height: 40px;
+    border-radius: 30px;
+    border: none;
+    background: #000000;
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+}

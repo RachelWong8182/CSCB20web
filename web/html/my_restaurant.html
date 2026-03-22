@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Store</title>
+    <link rel="stylesheet" href="css/restaurant_listing.css">
+    <link rel="stylesheet" href="css/mainpage.css">
+</head>
+
+<body>
+
+    <!-- Same titleline as other pages -->
+    <nav class="titleline">
+        <a href="/"><button name="logo_button" id="logo-button">
+            <img src="profile_icon.png" alt="home">
+        </button></a>
+
+        <input id="searchbox" type="search" placeholder="search for a specific restaurant...">
+
+        <button name="manager_button" id="manager-button" style="display:none"> I'm a restaurant manager +</button>
+        <button id="mystore-button" style="display:none" onclick="window.location.href='/my_restaurant.html'">My Restaurant</button>
+
+        <button name="likes_button" id="likes-button">
+            <img src="heart.png" alt="likes">
+        </button>
+
+        <button id="login-button">
+            <img src="profile_icon.png" alt="profile">
+        </button>
+
+        <div id="settingMenu" class="setting-menu">
+            <a href="#">Profile</a>
+            <a href="#">Settings</a>
+            <a href="#">Logout</a>
+        </div>
+    </nav>
+
+    <!-- My Store Content -->
+    <div class="store-page">
+
+        <!-- Left: Photo browser -->
+        <div class="store-photo-section">
+            <div class="photo-upload-box" onclick="document.getElementById('photo-input').click()">
+                <img id="store-photo-preview" src="" alt="" style="display:none;">
+                <div id="photo-placeholder" class="photo-placeholder">
+                    <span class="photo-icon">📷</span>
+                    <p>Click to upload restaurant photo</p>
+                </div>
+            </div>
+            <input type="file" id="photo-input" accept="image/*" style="display:none;" onchange="previewPhoto(event)">
+            <button class="save-photo-btn" onclick="savePhoto()">Save Photo</button>
+        </div>
+
+        <!-- Right: Restaurant info editor -->
+        <div class="store-info-section">
+            <h2 class="store-section-title">Restaurant Details</h2>
+
+            <label class="store-label">Restaurant Name</label>
+            <input type="text" id="store-name" class="store-input" placeholder="Enter restaurant name">
+
+            <label class="store-label">Cuisine Type</label>
+            <input type="text" id="store-cuisine" class="store-input" placeholder="e.g. Italian, Chinese...">
+
+            <label class="store-label">Address</label>
+            <input type="text" id="store-address" class="store-input" placeholder="Enter address">
+
+            <label class="store-label">Average Cost per Person</label>
+            <input type="text" id="store-price" class="store-input" placeholder="e.g. $20">
+
+            <label class="store-label">Opening Hours</label>
+            <input type="text" id="store-hours" class="store-input" placeholder="e.g. Mon–Fri 11am–10pm">
+
+            <label class="store-label">Description</label>
+            <textarea id="store-description" class="store-textarea" placeholder="Describe your restaurant..."></textarea>
+
+            <p id="store-save-msg" style="color:green; display:none; margin-top:8px;">Saved successfully!</p>
+            <p id="store-error-msg" style="color:red; display:none; margin-top:8px;"></p>
+
+            <button class="store-save-btn" onclick="saveStoreInfo()">Save Changes</button>
+        </div>
+
+    </div>
+
+    <div id="modal-container"></div>
+    <script src="java/login_window.js"></script>
+    <script src="java/my_restaurant.js"></script>
+
+</body>
+</html>
