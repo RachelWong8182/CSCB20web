@@ -82,16 +82,39 @@ function saveStoreInfo() {
 
 // ===== Load existing store info on page load =====
 document.addEventListener('DOMContentLoaded', () => {
+
+    // ===== Cuisine tag click handler =====
+    const tags = document.querySelectorAll('.cuisine-tag');
+    const cuisineInput = document.getElementById('store-cuisine');
+
+    tags.forEach(tag => {
+        tag.addEventListener('click', () => {
+            // Deselect all, select clicked
+            tags.forEach(t => t.classList.remove('selected'));
+            tag.classList.add('selected');
+            cuisineInput.value = tag.dataset.value;
+        });
+    });
+
     fetch('/api/store/info')
         .then(r => r.json())
         .then(data => {
             if (data.success && data.store) {
                 document.getElementById('store-name').value        = data.store.name        || '';
-                document.getElementById('store-cuisine').value     = data.store.cuisine     || '';
                 document.getElementById('store-address').value     = data.store.address     || '';
                 document.getElementById('store-price').value       = data.store.price       || '';
                 document.getElementById('store-hours').value       = data.store.hours       || '';
                 document.getElementById('store-description').value = data.store.description || '';
+
+                // Restore selected cuisine tag
+                if (data.store.cuisine) {
+                    cuisineInput.value = data.store.cuisine;
+                    tags.forEach(tag => {
+                        if (tag.dataset.value === data.store.cuisine) {
+                            tag.classList.add('selected');
+                        }
+                    });
+                }
 
                 // Load existing photo if any
                 if (data.store.photo_url) {

@@ -61,7 +61,17 @@
             <input type="text" id="store-name" class="store-input" placeholder="Enter restaurant name">
 
             <label class="store-label">Cuisine Type</label>
-            <input type="text" id="store-cuisine" class="store-input" placeholder="e.g. Italian, Chinese...">
+            <div class="cuisine-tags">
+                <button type="button" class="cuisine-tag" data-value="Italian">🍝 Italian</button>
+                <button type="button" class="cuisine-tag" data-value="Chinese">🥢 Chinese</button>
+                <button type="button" class="cuisine-tag" data-value="Japanese">🍣 Japanese</button>
+                <button type="button" class="cuisine-tag" data-value="Korean">🍜 Korean</button>
+                <button type="button" class="cuisine-tag" data-value="French">🥐 French</button>
+                <button type="button" class="cuisine-tag" data-value="Thai">🌶️ Thai</button>
+                <button type="button" class="cuisine-tag" data-value="Indian">🍛 Indian</button>
+                <button type="button" class="cuisine-tag" data-value="Others">🍴 Others</button>
+            </div>
+            <input type="hidden" id="store-cuisine">
 
             <label class="store-label">Address</label>
             <input type="text" id="store-address" class="store-input" placeholder="Enter address">

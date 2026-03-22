@@ -66,29 +66,29 @@ def my_restaurant():
 def italianFood():
     return render_template('restaurant_italian.html')
 
-@app.route('/Chinese.html')
+@app.route('/restaurant_chinese.html')
 def chineseFood():
-    return render_template('Chinese.html')
+    return render_template('restaurant_chinese.html')
 
-@app.route('/Japanese.html')
+@app.route('/restaurant_japanese.html')
 def japaneseFood():
-    return render_template('Japanese.html')
+    return render_template('restaurant_japanese.html')
 
-@app.route('/Korean.html')
+@app.route('/restaurant_korean.html')
 def koreanFood():
-    return render_template('Korean.html')
+    return render_template('restaurant_korean.html')
 
-@app.route('/French.html')
+@app.route('/restaurant_french.html')
 def frenchFood():
-    return render_template('French.html')
+    return render_template('restaurant_french.html')
 
-@app.route('/Thai.html')
+@app.route('/restaurant_thai.html')
 def thaiFood():
-    return render_template('Thai.html')
+    return render_template('restaurant_thai.html')
 
-@app.route('/Indian.html')
+@app.route('/restaurant_indian.html')
 def indianFood():
-    return render_template('Indian.html')
+    return render_template('restaurant_indian.html')
 
 @app.route('/api/register', methods=['POST'])
 def register():
@@ -201,6 +201,35 @@ def save_store_photo():
     conn.commit()
     conn.close()
     return jsonify({'success': True, 'photo_url': photo_url})
+
+
+# ===== Public: Get all restaurants by cuisine =====
+@app.route('/api/restaurants/<cuisine>')
+def get_restaurants_by_cuisine(cuisine):
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    # Case-insensitive match on cuisine field
+    cursor.execute('''
+        SELECT name, address, price, hours, description, photo_url
+        FROM stores
+        WHERE LOWER(cuisine) = LOWER(?)
+    ''', (cuisine,))
+    rows = cursor.fetchall()
+    conn.close()
+
+    restaurants = []
+    for row in rows:
+        restaurants.append({
+            'name':        row[0],
+            'address':     row[1],
+            'price':       row[2],
+            'hours':       row[3],
+            'description': row[4],
+            'photo_url':   row[5],
+        })
+
+    return jsonify({'success': True, 'restaurants': restaurants})
+
 
 if __name__ == '__main__':
     init_db()
