@@ -1,0 +1,81 @@
+#first_button{
+    margin-left: 1000px;
+    margin-top: 360px;
+    height: 35px;
+    width: 150px;
+    background-color: black;
+    color:white;
+    border: none;
+    border-radius: 10px;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+#add_comment{
+    margin-left: 350px;
+    width: 400px;
+    margin-top: 30px;
+    height: 30px;
+    border-radius: 10px;
+}
+
+#comment_b{
+    height: 35px;
+    width: 100px;
+    background-color: black;
+    color: white;
+    font-size: 14px;
+    border-radius: 10px;
+}
+
+#user_email{
+    font-size: 14px;
+    color: grey;
+}
+
+#created_time{
+    font-size: 11px;
+    color: grey;
+}
+
+#content{
+    font-size: 16px;
+}
+
+.comment_format{
+    margin-top: 20px;
+    margin-bottom: 40px;
+    margin-left: 100px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    border-bottom: 2px solid grey;
+    max-width: 1000px;
+}
+
+.restaurant-top-bar{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1150px;
+    margin: 40px auto 20px auto;
+    padding: 0 40px;
+}
+
+#detail-like-btn{
+    width: 50px;
+    height: 50px;
+    border: none;
+    background: white;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+#detail-like-btn img{
+    width: 26px;
+    height: 26px;
+    object-fit: contain;
+}

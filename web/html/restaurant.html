@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/css/mainpage.css">
+    <link rel="stylesheet" href="/css/restaurant.css">
+</head>
+<body>
+    <div class="restaurant-top-bar">
+        <button id="first_button">Add Comment</button>
+        <button id="detail-like-btn" type="button">
+            <img src="/heart.png" alt="like">
+        </button>
+    </div>
+    
+    <form style="display: none;" action="/add_comment/{{restaurant_id}}" id="comment_form" method="POST">
+        <input type="text" name="new_comment" id="add_comment" placeholder="Add Your Comments Here...">
+        <button id="comment_b" type="submit">submit</button>
+    </form>
+    {% for comment in comments %}
+    <div class="comment_format">
+        <p id="user_email">{{comment[2]}}</p>
+        <p id="content">{{comment[0]}}</p>
+        <p id="created_time">{{comment[1]}}</p>
+    </div>
+    {% endfor %}
+    {% if session.get("user_id") %}
+        <div data-login="True" data-role="{{session.get('role', 'Unknown')}}" style="display:none;" id="login1"></div>
+    {% else %}
+        <div data-login="False" style="display:none;" id="login2"></div>
+    {% endif %}
+    <div id="modal-container"></div>
+    <script src="/java/login_window.js"></script>
+    <script src="/java/restaurant.js"></script>
+</body>
+</html>

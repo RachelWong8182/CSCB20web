@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, session
+from flask import Flask, render_template, request, jsonify, session, redirect, url_for
 import sqlite3
 import hashlib
 import os
@@ -35,6 +35,30 @@ def init_db():
             FOREIGN KEY (manager_id) REFERENCES users(id)
         )
     ''')
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS likes (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            store_name TEXT NOT NULL,
+            cuisine TEXT,
+            address TEXT,
+            price TEXT,
+            hours TEXT,
+            description TEXT,
+            photo_url TEXT,
+            UNIQUE(user_id, store_name),
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        )
+    ''')
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS Comments(
+            comment_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            content TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            user_id INTEGER REFERENCES users(id) NOT NULL,
+            restaurant_id INTEGER REFERENCES stores(id) NOT NULL
+            )
+        ''')  
     conn.commit()
     conn.close()
 
@@ -89,6 +113,10 @@ def thaiFood():
 @app.route('/restaurant_indian.html')
 def indianFood():
     return render_template('restaurant_indian.html')
+
+@app.route('/liked_restaurants.html')
+def liked_restaurants_page():
+    return render_template('liked_restaurants.html')
 
 @app.route('/api/register', methods=['POST'])
 def register():
@@ -210,7 +238,7 @@ def get_restaurants_by_cuisine(cuisine):
     cursor = conn.cursor()
     # Case-insensitive match on cuisine field
     cursor.execute('''
-        SELECT name, address, price, hours, description, photo_url
+        SELECT id, name, address, price, hours, description, photo_url
         FROM stores
         WHERE LOWER(cuisine) = LOWER(?)
     ''', (cuisine,))
@@ -220,16 +248,148 @@ def get_restaurants_by_cuisine(cuisine):
     restaurants = []
     for row in rows:
         restaurants.append({
-            'name':        row[0],
-            'address':     row[1],
-            'price':       row[2],
-            'hours':       row[3],
-            'description': row[4],
-            'photo_url':   row[5],
+            'id':          row[0],
+            'name':        row[1],
+            'address':     row[2],
+            'price':       row[3],
+            'hours':       row[4],
+            'description': row[5],
+            'photo_url':   row[6],
         })
 
     return jsonify({'success': True, 'restaurants': restaurants})
 
+@app.route('/api/likes', methods=['POST'])
+def add_like():
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'message': 'Not logged in.'})
+
+    data = request.get_json()
+    user_id = session['user_id']
+    store_name = data.get('name', '')
+
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    cursor.execute('''
+        SELECT id FROM likes
+        WHERE user_id = ? AND store_name = ?
+    ''', (user_id, store_name))
+
+    existing = cursor.fetchone()
+
+    if existing:
+        conn.close()
+        return jsonify({'success': True, 'already_added': True})
+
+    cursor.execute('''
+        INSERT INTO likes
+        (user_id, store_name, cuisine, address, price, hours, description, photo_url)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    ''', (
+        user_id,
+        store_name,
+        data.get('cuisine', ''),
+        data.get('address', ''),
+        data.get('price', ''),
+        data.get('hours', ''),
+        data.get('description', ''),
+        data.get('photo_url', '')
+    ))
+
+    conn.commit()
+    conn.close()
+
+    return jsonify({'success': True, 'already_added': False})
+
+@app.route('/api/likes', methods=['GET'])
+def get_likes():
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'message': 'Not logged in.'})
+
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute('''
+        SELECT store_name, cuisine, address, price, hours, description, photo_url
+        FROM likes
+        WHERE user_id = ?
+    ''', (session['user_id'],))
+    rows = cursor.fetchall()
+    conn.close()
+
+    likes = []
+    for row in rows:
+        likes.append({
+            'name': row[0],
+            'cuisine': row[1],
+            'address': row[2],
+            'price': row[3],
+            'hours': row[4],
+            'description': row[5],
+            'photo_url': row[6]
+        })
+
+    return jsonify({'success': True, 'likes': likes})
+
+@app.route('/api/likes', methods=['DELETE'])
+def remove_like():
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'message': 'Not logged in.'})
+
+    data = request.get_json()
+    store_name = data.get('name', '').strip()
+
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute('''
+        DELETE FROM likes
+        WHERE user_id = ? AND store_name = ?
+    ''', (session['user_id'], store_name))
+    conn.commit()
+    conn.close()
+
+    return jsonify({'success': True})
+
+@app.route('/restaurant/<int:restaurant_id>')
+def restaurant(restaurant_id):
+    db = sqlite3.connect(DB_PATH)
+    comments = db.execute('SELECT content, created_at, email FROM Comments JOIN users ON Comments.user_id = users.id WHERE restaurant_id = ?',
+                           (restaurant_id,)).fetchall()
+    return render_template("restaurant.html", comments=comments, restaurant_id=restaurant_id)
+
+@app.route('/add_comment/<int:restaurant_id>', methods=["POST"])
+def add_comment(restaurant_id):
+    comment = request.form.get("new_comment")
+    db = sqlite3.connect(DB_PATH)
+    db.execute('INSERT INTO Comments (content, restaurant_id, user_id) VALUES (?, ?, ?)',(comment, restaurant_id, session['user_id']))
+    db.commit()
+    return redirect(url_for("restaurant", restaurant_id=restaurant_id))
+
+@app.route('/api/restaurant/<int:restaurant_id>')
+def get_single_restaurant(restaurant_id):
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute('''
+        SELECT id, name, cuisine, address, price, hours, description, photo_url
+        FROM stores
+        WHERE id = ?
+    ''', (restaurant_id,))
+    row = cursor.fetchone()
+    conn.close()
+
+    if not row:
+        return jsonify({'success': False, 'message': 'Restaurant not found'})
+
+    return jsonify({
+        'id': row[0],
+        'name': row[1],
+        'cuisine': row[2],
+        'address': row[3],
+        'price': row[4],
+        'hours': row[5],
+        'description': row[6],
+        'photo_url': row[7]
+    })
 
 if __name__ == '__main__':
     init_db()

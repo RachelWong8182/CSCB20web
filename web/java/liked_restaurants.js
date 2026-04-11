@@ -1,36 +1,15 @@
-const searchInput   = document.getElementById('searchbox');
+const searchInput = document.getElementById('searchbox');
 const filterButtons = document.querySelectorAll('.filter-btn');
 const restaurantList = document.getElementById('restaurantList');
 
-// All loaded cards (replaces the old hardcoded array)
 let restaurantCards = [];
 
-
-// ===== Detect which cuisine page we're on =====
-// Maps filename → cuisine string that must match what manager typed
-const cuisineMap = {
-    'restaurant_italian.html':  'Italian',
-    'restaurant_chinese.html':  'Chinese',
-    'restaurant_japanese.html': 'Japanese',
-    'restaurant_korean.html':   'Korean',
-    'restaurant_french.html':   'French',
-    'restaurant_thai.html':     'Thai',
-    'restaurant_indian.html':   'Indian',
-    'restaurant_others.html':   'Others',
-};
-
-const currentPage = window.location.pathname.split('/').pop();
-const cuisine     = cuisineMap[currentPage] || '';
-
-
-// ===== Build a card element from a store object =====
-function createCard(store) {
-    const card = document.createElement('button');
+function createLikedCard(store) {
+    const card = document.createElement('div');
     card.className = 'restaurant-card';
-    card.dataset.name     = store.name     || '';
-    card.dataset.rating   = store.rating   || '0';
-    card.dataset.price    = store.price    || '$0';
-    card.dataset.distance = store.distance || '0';
+    card.dataset.name = store.name || '';
+    card.dataset.rating = store.rating || '0';
+    card.dataset.price = store.price || '$0';
 
     card.innerHTML = `
         <div class="restaurant-info">
@@ -42,33 +21,33 @@ function createCard(store) {
         </div>
 
         <div style="margin-left:auto; display:flex; align-items:center; gap:12px;">
-            ${store.photo_url ? `<img src="${store.photo_url}" style="width:80px;height:80px;object-fit:cover;border-radius:10px;margin-left:auto;">` : ''}
-            <button class="like-btn" style="width:42px;height:42px;border:none;border-radius:50%;background:white;font-size:24px;cursor:pointer;">♡</button>
+            ${store.photo_url ? `<img src="${store.photo_url}" style="width:80px;height:80px;object-fit:cover;border-radius:10px;">` : ''}
+            <button class="delete-like-btn" type="button" style="width:42px;height:42px;border:none;border-radius:50%;background:white;font-size:20px;cursor:pointer;">🗑️</button>
         </div>
     `;
 
-    //also the like button
-    const likeBtn = card.querySelector('.like-btn');
-    likeBtn.addEventListener('click', (e) => {
+    const deleteBtn = card.querySelector('.delete-like-btn');
+    deleteBtn.addEventListener('click', (e) => {
         e.stopPropagation();
 
         fetch('/api/likes', {
-            method: 'POST',
+            method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(store)
+            body: JSON.stringify({ name: store.name })
         })
-        .then(response => response.json())
+        .then(r => r.json())
         .then(data => {
             if (data.success) {
-                if (data.already_added) {
-                    alert('Already added');
-                } else {
-                    alert('Added to like list');
+                card.remove();
+                restaurantCards = restaurantCards.filter(c => c !== card);
+
+                if (restaurantCards.length === 0) {
+                    restaurantList.innerHTML = '<p style="color:#aaa; padding:20px;">No liked restaurants yet.</p>';
                 }
             } else {
-                alert(data.message || 'Failed to add to like list');
+                alert(data.message || 'Failed to remove from like list');
             }
         })
         .catch(error => {
@@ -78,7 +57,6 @@ function createCard(store) {
     });
 
     card.addEventListener('click', () => {
-        window.location.href = '/restaurant/' + store.id;
         restaurantCards.forEach(c => c.classList.remove('active'));
         card.classList.add('active');
     });
@@ -86,35 +64,33 @@ function createCard(store) {
     return card;
 }
 
-
-// ===== Load restaurants for this cuisine from API =====
-function loadRestaurants() {
-    if (!cuisine) return;
-
-    fetch(`/api/restaurants/${encodeURIComponent(cuisine)}`)
+function loadLikedRestaurants() {
+    fetch('/api/likes')
         .then(r => r.json())
         .then(data => {
             restaurantList.innerHTML = '';
             restaurantCards = [];
 
-            if (!data.restaurants || data.restaurants.length === 0) {
-                restaurantList.innerHTML = '<p style="color:#aaa; padding:20px;">No restaurants listed yet for this cuisine.</p>';
+            if (!data.success) {
+                restaurantList.innerHTML = '<p style="color:#aaa; padding:20px;">Please log in to view your liked restaurants.</p>';
                 return;
             }
 
-            data.restaurants.forEach(store => {
-                const card = createCard(store);
+            if (!data.likes || data.likes.length === 0) {
+                restaurantList.innerHTML = '<p style="color:#aaa; padding:20px;">No liked restaurants yet.</p>';
+                return;
+            }
+
+            data.likes.forEach(store => {
+                const card = createLikedCard(store);
                 restaurantList.appendChild(card);
                 restaurantCards.push(card);
             });
 
-            // Re-attach search listener after cards are loaded
             attachSearch();
         });
 }
 
-
-// ===== Search =====
 function attachSearch() {
     searchInput.addEventListener('input', () => {
         const keyword = searchInput.value.trim().toLowerCase();
@@ -125,8 +101,6 @@ function attachSearch() {
     });
 }
 
-
-// ===== Filter/Sort =====
 filterButtons.forEach(button => {
     button.addEventListener('click', () => {
         const type = button.dataset.filter;
@@ -151,8 +125,6 @@ function extractPrice(priceText) {
     return match ? Number(match[0]) : 0;
 }
 
-
-// ===== Run on page load =====
 document.addEventListener('DOMContentLoaded', () => {
-    loadRestaurants();
+    loadLikedRestaurants();
 });

@@ -57,6 +57,7 @@ function submitLogin() {
         if (data.success) {
             document.getElementById('login-popup').style.display = 'none';
             applySessionUI(data.role, data.email);
+            location.reload();
         } else {
             errorEl.textContent = data.message;
             errorEl.style.display = 'block';
@@ -208,6 +209,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const managerBtn = document.getElementById('manager-button');
     if (managerBtn) {
         managerBtn.onclick = manager_login_popup;
+    }
+
+    const likesBtn = document.getElementById('likes-button');
+    if (likesBtn) {
+        likesBtn.onclick = () => {
+            window.location.href = '/liked_restaurants.html';
+        };
     }
 
     // Check existing session
