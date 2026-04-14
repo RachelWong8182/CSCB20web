@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, session, redirect, url_for
+from flask import Flask, render_template, request, jsonify, session, redirect, url_for, send_from_directory
 import sqlite3
 import hashlib
 import os
@@ -120,6 +120,10 @@ def indianFood():
 @app.route('/liked_restaurants.html')
 def liked_restaurants_page():
     return render_template('liked_restaurants.html')
+
+@app.route('/store_photos/<filename>')
+def serve_store_photo(filename):
+    return send_from_directory(UPLOAD_FOLDER, filename)
 
 @app.route('/api/register', methods=['POST'])
 def register():
