@@ -404,10 +404,10 @@ def forgot_password():
     cursor.execute('SELECT id FROM users WHERE email = ?', (email,))
     user = cursor.fetchone()
     conn.close()
- 
+
     if not user:
         # Don't reveal whether the email exists — always return success
-        return jsonify({'success': True})
+        return jsonify({'success': False, 'message': 'Email not registered.'})
  
     token = secrets.token_urlsafe(32)
     reset_tokens[token] = {

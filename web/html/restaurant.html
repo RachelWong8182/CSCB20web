@@ -3,22 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Restaurant</title>
     <link rel="stylesheet" href="/css/mainpage.css">
     <link rel="stylesheet" href="/css/restaurant.css">
 </head>
+
 <body>
+<nav class="titleline">
+
+    <a href="/">
+        <button name="logo_button" id="logo-button">
+            <img src="/logo.png" alt="home">
+        </button>
+    </a>
+
+    <input id="searchbox" type="search" placeholder="search for a specific restaurant...">
+
+    <button name="manager_button" id="manager-button"> I'm a restaurant manager +
+    </button>
+
+    <button id="mystore-button" onclick="window.location.href='/my_restaurant.html'" style="display:none;">
+        My Restaurant
+    </button>
+
+    <button name="likes_button" id="likes-button">
+        <img src="../heart.png" alt="likes">
+    </button>
+
+
+    <button name="login_button" id="login-button">
+        <img src="../profile_icon.png" alt="profile">
+    </button>
+    
+
+    <div id="settingMenu" class="setting-menu">
+        <a href="#">Profile</a>
+        <a href="#">Settings</a>
+        <a href="#">Logout</a>
+    </div>
+
+</nav>
+
+    <!-- ===== Restaurant Info Section ===== -->
+    <div class="restaurant-detail" id="restaurant-detail" style="margin-top:0;">
+        <div class="restaurant-detail-photo-wrap">
+            <img id="detail-photo" src="" alt="Restaurant Photo" style="display:none;">
+            <div id="detail-photo-placeholder" class="detail-photo-placeholder">No Photo</div>
+        </div>
+        <div class="restaurant-detail-info-wrap">
+            <div class="restaurant-detail-info">
+                <h1 id="detail-name">Loading...</h1>
+                <p id="detail-cuisine" class="detail-tag"></p>
+                <p id="detail-address" class="detail-meta">📍 <span></span></p>
+                <p id="detail-price"   class="detail-meta">💰 <span></span> / person</p>
+                <p id="detail-hours"   class="detail-meta">🕐 <span></span></p>
+                <p id="detail-description" class="detail-description"></p>
+            </div>
+            <button id="detail-like-btn" type="button">
+                <img src="/heart.png" alt="like">
+            </button>
+        </div>
+    </div>
+
+    <!-- ===== Action Bar ===== -->
     <div class="restaurant-top-bar">
         <button id="first_button">Add Comment</button>
-        <button id="detail-like-btn" type="button">
-            <img src="/heart.png" alt="like">
-        </button>
     </div>
-    
+
+    <!-- ===== Comment Form ===== -->
     <form style="display: none;" action="/add_comment/{{restaurant_id}}" id="comment_form" method="POST">
         <input type="text" name="new_comment" id="add_comment" placeholder="Add Your Comments Here...">
-        <button id="comment_b" type="submit">submit</button>
+        <button id="comment_b" type="submit">Submit</button>
     </form>
+
+    <!-- ===== Comments List ===== -->
     {% for comment in comments %}
     <div class="comment_format">
         <p id="user_email">{{comment[2]}}</p>
@@ -26,13 +84,15 @@
         <p id="created_time">{{comment[1]}}</p>
     </div>
     {% endfor %}
+
     {% if session.get("user_id") %}
         <div data-login="True" data-role="{{session.get('role', 'Unknown')}}" style="display:none;" id="login1"></div>
     {% else %}
         <div data-login="False" style="display:none;" id="login2"></div>
     {% endif %}
+
     <div id="modal-container"></div>
-    
+
     <script src="/java/login_window.js"></script>
     <script src="/java/restaurant.js"></script>
 </body>

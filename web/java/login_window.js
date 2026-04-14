@@ -204,49 +204,42 @@ function submitForgotPassword() {
 
 
 // ===== Forgot Password: Step 2 — submit new password =====
-function submitResetPassword() {
-    const code     = document.getElementById('reset-code').value.trim();
-    const password = document.getElementById('reset-new-password').value.trim();
-    const confirm  = document.getElementById('reset-confirm-password').value.trim();
-    const errorEl  = document.getElementById('reset-error');
+function submitForgotPassword() {
+    const email = document.getElementById('forgot-email').value.trim();
+    const errorEl = document.getElementById('forgot-error');
+    const successEl = document.getElementById('forgot-success');
+
+    if (!errorEl || !successEl) return;  // ← add this safety check
 
     errorEl.style.display = 'none';
+    successEl.style.display = 'none';
 
-    if (!code || !password || !confirm) {
-        errorEl.textContent = 'All fields are required.';
-        errorEl.style.display = 'block';
-        return;
-    }
-    if (password !== confirm) {
-        errorEl.textContent = 'Passwords do not match.';
+    if (!email) {
+        errorEl.textContent = 'Please enter your email.';
         errorEl.style.display = 'block';
         return;
     }
 
-    fetch('/api/reset_password', {
+    fetch('/api/forgot_password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: code, new_password: password })
+        body: JSON.stringify({ email })
     })
     .then(r => r.json())
     .then(data => {
         if (data.success) {
-            hideAllPopups();
-            // Re-open login with a brief success hint
-            document.getElementById('login-popup').style.display = 'flex';
-            const errorLogin = document.getElementById('login-error');
-            if (errorLogin) {
-                errorLogin.style.color  = 'green';
-                errorLogin.textContent  = 'Password reset! Please log in.';
-                errorLogin.style.display = 'block';
-            }
+            successEl.textContent = 'Reset code sent! Check your email.';
+            successEl.style.display = 'block';
+            setTimeout(() => {
+                hideAllPopups();
+                document.getElementById('reset-password-popup').style.display = 'flex';
+            }, 1500);
         } else {
-            errorEl.textContent = data.message;
+            errorEl.textContent = data.message || 'Something went wrong.';  // ← fallback
             errorEl.style.display = 'block';
         }
     });
 }
-
 
 // ===== Logout =====
 function logout() {
