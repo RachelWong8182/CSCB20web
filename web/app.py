@@ -2,8 +2,11 @@ from flask import Flask, render_template, request, jsonify, session, redirect, u
 import sqlite3
 import hashlib
 import os
+import secrets
+import time
 
 app = Flask(__name__, template_folder='html', static_folder='.', static_url_path='')
+reset_tokens = {}
 app.secret_key = 'your-secret-key-change-this'
 
 DB_PATH = 'database.db'
@@ -390,6 +393,59 @@ def get_single_restaurant(restaurant_id):
         'description': row[6],
         'photo_url': row[7]
     })
+
+@app.route('/api/forgot_password', methods=['POST'])
+def forgot_password():
+    data  = request.get_json()
+    email = data.get('email', '').strip()
+ 
+    conn   = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute('SELECT id FROM users WHERE email = ?', (email,))
+    user = cursor.fetchone()
+    conn.close()
+ 
+    if not user:
+        # Don't reveal whether the email exists — always return success
+        return jsonify({'success': True})
+ 
+    token = secrets.token_urlsafe(32)
+    reset_tokens[token] = {
+        'email':   email,
+        'expires': time.time() + 3600  # 1 hour
+    }
+ 
+    # --- Real app: send an email here ---
+    # For now, print to console so you can test
+    print(f"\n[DEV] Password reset token for {email}: {token}\n")
+ 
+    return jsonify({'success': True})
+ 
+ 
+@app.route('/api/reset_password', methods=['POST'])
+def reset_password():
+    data     = request.get_json()
+    token    = data.get('token', '').strip()
+    new_pass = data.get('new_password', '').strip()
+ 
+    entry = reset_tokens.get(token)
+    if not entry:
+        return jsonify({'success': False, 'message': 'Invalid or expired reset code.'})
+    if time.time() > entry['expires']:
+        del reset_tokens[token]
+        return jsonify({'success': False, 'message': 'Reset code has expired. Please request a new one.'})
+    if not new_pass:
+        return jsonify({'success': False, 'message': 'Password cannot be empty.'})
+ 
+    conn   = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute('UPDATE users SET password = ? WHERE email = ?',
+                   (hash_password(new_pass), entry['email']))
+    conn.commit()
+    conn.close()
+ 
+    del reset_tokens[token]  # one-time use
+    return jsonify({'success': True})
 
 if __name__ == '__main__':
     init_db()

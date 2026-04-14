@@ -8,11 +8,17 @@
         <h2 class="modal-title">Welcome Back</h2>
 
         <input id="login-email" type="email" placeholder="email" class="modal-input">
-        <input id="login-password" type="password" placeholder="password" class="modal-input">
+        <div class="password-wrapper">
+            <input id="login-password" type="password" placeholder="password" class="modal-input">
+            <button type="button" class="btn-eye" onclick="togglePassword('login-password', this)" aria-label="Show password">
+                <img class="eye-icon" src="eye.png" width="17" height="17">
+                <img class="eye-off-icon" src="eye-crossed.png" width="17" height="17" style="display:none">
+            </button>
+        </div>
         <p id="login-error" style="color:red; font-size:13px; margin-bottom:8px; display:none;"></p>
 
         <button class="btn-login" onclick="submitLogin()">Login</button>
-        <button class="btn-forget-password">Forget Password?</button>
+        <button class="btn-forget-password" onclick="forgot_password_popup()">Forget Password?</button>
 
         <p>Don't have an account?
             <button class="btn-register" onclick="register_popup()">Register</button>
@@ -32,8 +38,20 @@
         <h2 class="modal-title">Register</h2>
 
         <input id="register-email" type="email" placeholder="email" class="modal-input">
-        <input id="register-password" type="password" placeholder="create password" class="modal-input">
-        <input id="register-confirm" type="password" placeholder="confirm password" class="modal-input">
+        <div class="password-wrapper">
+            <input id="register-password" type="password" placeholder="create password" class="modal-input">
+            <button type="button" class="btn-eye" onclick="togglePassword('register-password', this)" aria-label="Show password">
+                <img class="eye-icon" src="eye.png" width="17" height="17">
+                <img class="eye-off-icon" src="eye-crossed.png" width="17" height="17" style="display:none">
+            </button>
+        </div>
+        <div class="password-wrapper">
+            <input id="register-confirm" type="password" placeholder="confirm password" class="modal-input">
+            <button type="button" class="btn-eye" onclick="togglePassword('register-confirm', this)" aria-label="Show password">
+                <img class="eye-icon" src="eye.png" width="17" height="17">
+                <img class="eye-off-icon" src="eye-crossed.png" width="17" height="17" style="display:none">
+            </button>
+        </div>
         <p id="register-error" style="color:red; font-size:13px; margin-bottom:8px; display:none;"></p>
 
         <button class="btn-login" onclick="submitRegister('user')">Create Account</button>
@@ -52,7 +70,13 @@
         <h2 class="modal-title">Manager Login</h2>
 
         <input id="manager-login-email" type="email" placeholder="email" class="modal-input">
-        <input id="manager-login-password" type="password" placeholder="password" class="modal-input">
+        <div class="password-wrapper">
+            <input id="manager-login-password" type="password" placeholder="password" class="modal-input">
+            <button type="button" class="btn-eye" onclick="togglePassword('manager-login-password', this)" aria-label="Show password">
+                <img class="eye-icon" src="eye.png" width="17" height="17">
+                <img class="eye-off-icon" src="eye-crossed.png" width="17" height="17" style="display:none">
+            </button>
+        </div>
         <p id="manager-login-error" style="color:red; font-size:13px; margin-bottom:8px; display:none;"></p>
 
         <button class="btn-login" onclick="submitManagerLogin()">Login</button>
@@ -75,11 +99,77 @@
         <h2 class="modal-title">Manager Register</h2>
 
         <input id="manager-register-email" type="email" placeholder="email" class="modal-input">
-        <input id="manager-register-password" type="password" placeholder="create password" class="modal-input">
-        <input id="manager-register-confirm" type="password" placeholder="confirm password" class="modal-input">
+        <div class="password-wrapper">
+            <input id="manager-register-password" type="password" placeholder="create password" class="modal-input">
+            <button type="button" class="btn-eye" onclick="togglePassword('manager-register-password', this)" aria-label="Show password">
+                <img class="eye-icon" src="eye.png" width="17" height="17">
+                <img class="eye-off-icon" src="eye-crossed.png" width="17" height="17" style="display:none">
+            </button>
+        </div>
+        <div class="password-wrapper">
+            <input id="manager-register-confirm" type="password" placeholder="confirm password" class="modal-input">
+            <button type="button" class="btn-eye" onclick="togglePassword('manager-register-confirm', this)" aria-label="Show password">
+                <img class="eye-icon" src="eye.png" width="17" height="17">
+                <img class="eye-off-icon" src="eye-crossed.png" width="17" height="17" style="display:none">
+            </button>
+        </div>
         <p id="manager-register-error" style="color:red; font-size:13px; margin-bottom:8px; display:none;"></p>
 
         <button class="btn-login" onclick="submitRegister('manager')">Create Manager Account</button>
+
+    </div>
+</div>
+
+
+<!-- ===== Forgot Password (Step 1: Enter Email) ===== -->
+<div id="forgot-password-popup" class="modal-overlay">
+    <div class="modal-box">
+
+        <button class="btn-close"
+            onclick="document.getElementById('forgot-password-popup').style.display='none'">✕</button>
+
+        <h2 class="modal-title">Reset Password</h2>
+        <p style="font-size:13px; color:#666; margin-bottom:14px;">Enter your email and we'll send you a reset code.</p>
+
+        <input id="forgot-email" type="email" placeholder="your email" class="modal-input">
+        <p id="forgot-error" style="color:red; font-size:13px; margin-bottom:8px; display:none;"></p>
+        <p id="forgot-success" style="color:green; font-size:13px; margin-bottom:8px; display:none;"></p>
+
+        <button class="btn-login" onclick="submitForgotPassword()">Send Reset Code</button>
+        <button class="btn-forget-password" onclick="showPopup('login-popup')">Back to Login</button>
+
+    </div>
+</div>
+
+
+<!-- ===== Forgot Password (Step 2: Enter Code + New Password) ===== -->
+<div id="reset-password-popup" class="modal-overlay">
+    <div class="modal-box">
+
+        <button class="btn-close"
+            onclick="document.getElementById('reset-password-popup').style.display='none'">✕</button>
+
+        <h2 class="modal-title">Enter New Password</h2>
+        <p style="font-size:13px; color:#666; margin-bottom:14px;">Check your email for the reset code.</p>
+
+        <input id="reset-code" type="text" placeholder="reset code" class="modal-input">
+        <div class="password-wrapper">
+            <input id="reset-new-password" type="password" placeholder="new password" class="modal-input">
+            <button type="button" class="btn-eye" onclick="togglePassword('reset-new-password', this)" aria-label="Show password">
+                <img class="eye-icon" src="eye.png" width="17" height="17">
+                <img class="eye-off-icon" src="eye-crossed.png" width="17" height="17" style="display:none">
+            </button>
+        </div>
+        <div class="password-wrapper">
+            <input id="reset-confirm-password" type="password" placeholder="confirm new password" class="modal-input">
+            <button type="button" class="btn-eye" onclick="togglePassword('reset-confirm-password', this)" aria-label="Show password">
+                <img class="eye-icon" src="eye.png" width="17" height="17">
+                <img class="eye-off-icon" src="eye-crossed.png" width="17" height="17" style="display:none">
+            </button>
+        </div>
+        <p id="reset-error" style="color:red; font-size:13px; margin-bottom:8px; display:none;"></p>
+
+        <button class="btn-login" onclick="submitResetPassword()">Reset Password</button>
 
     </div>
 </div>

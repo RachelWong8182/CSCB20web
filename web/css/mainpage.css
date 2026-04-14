@@ -234,3 +234,52 @@ body{
     font-weight: bold;
     cursor: pointer;
 }
+
+
+/* ===== Password Eye Toggle ===== */
+.password-wrapper {
+    position: relative;
+    display: inline-block;
+    width: 300px;
+    margin-bottom: 20px;
+}
+
+.password-wrapper .modal-input {
+    width: 100%;
+    margin-bottom: 0;
+    padding-right: 42px;
+    box-sizing: border-box;
+}
+
+.btn-eye {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    color: #aaa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 0;
+}
+
+.btn-eye:hover {
+    color: #444;
+}
+
+.eye-icon, .eye-off-icon {
+    width: 17px;
+    height: 17px;
+    pointer-events: none;
+}
+
+/* Hide browser built-in password reveal buttons */
+input::-ms-reveal,
+input::-webkit-contacts-auto-fill-button,
+input::-webkit-credentials-auto-fill-button {
+    display: none;
+}
