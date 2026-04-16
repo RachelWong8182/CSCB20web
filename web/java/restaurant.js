@@ -57,7 +57,11 @@ document.querySelectorAll('.like_button').forEach(button =>{
         fetch('/api/comment_like/'+ commentid, {method: 'POST'})
         .then(response => response.json())
         .then(data =>{
-            button.querySelector('span').innerText = data.number_likes;
+            if(data.log_in === false){
+               alert("Please login first.")
+               login_popup();
+               return;
+            }
             if(data.liked === true){
                 button.innerHTML = '❤️<span>' + data.number_likes + '</span>';
             }

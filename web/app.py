@@ -393,7 +393,10 @@ def remove_like():
 @app.route('/restaurant/<int:restaurant_id>')
 def restaurant(restaurant_id):
     db = sqlite3.connect(DB_PATH)
-    comments = db.execute('SELECT content, created_at, email, Comments.comment_id, Comments.rating, (SELECT COUNT(*) FROM comment_like WHERE comment_id = Comments.comment_id) as like_count FROM Comments JOIN users ON Comments.user_id = users.id WHERE restaurant_id = ?',
+    comments = db.execute("""SELECT content, created_at, email, Comments.comment_id, Comments.rating, (SELECT COUNT(*) FROM comment_like 
+                          WHERE comment_id = Comments.comment_id) as like_count 
+                          FROM Comments JOIN users ON Comments.user_id = users.id 
+                          WHERE restaurant_id = ?""",
                            (restaurant_id,)).fetchall()
     return render_template("restaurant.html", comments=comments, restaurant_id=restaurant_id)
 
