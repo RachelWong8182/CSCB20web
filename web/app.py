@@ -59,9 +59,18 @@ def init_db():
             content TEXT NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             user_id INTEGER REFERENCES users(id) NOT NULL,
-            restaurant_id INTEGER REFERENCES stores(id) NOT NULL
+            restaurant_id INTEGER REFERENCES stores(id) NOT NULL,
+            rating INTEGER
             )
         ''')  
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS comment_like(
+            comment_like_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            comment_id INTEGER REFERENCES Comments(comment_id) NOT NULL,
+            users_id INTEGER REFERENCES users(id) NOT NULL,
+            UNIQUE(comment_id, users_id)
+            )
+        ''')
     conn.commit()
     conn.close()
 
@@ -266,6 +275,30 @@ def get_restaurants_by_cuisine(cuisine):
 
     return jsonify({'success': True, 'restaurants': restaurants})
 
+@app.route('/api/comment_like/<int:comment_id>', methods=['POST'])
+def comment_like(comment_id):
+    user_id = session.get('user_id', None)
+    if user_id is None:
+        return jsonify({'log_in': False, 'message':'Users did not login.'})
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute("SELECT users_id, comment_id FROM comment_like WHERE comment_id = ? AND users_id = ?",(comment_id, user_id))
+    result = cur.fetchone()
+    if result is None:
+        cur.execute("INSERT INTO comment_like(comment_id, users_id) VALUES(?, ?)",(comment_id, user_id))
+    else:
+        cur.execute("DELETE FROM comment_like WHERE comment_id = ? AND users_id = ?",(comment_id, user_id))
+    cur.execute("SELECT COUNT(comment_like_id) FROM comment_like WHERE comment_id = ?", (comment_id,))
+    num_likes = cur.fetchone()[0]
+    conn.commit()
+    conn.close()
+    if result is None:
+        liked = True
+    else:
+        liked = False
+    return jsonify({'success': True, 'number_likes': num_likes, 'liked': liked})
+
+
 @app.route('/api/likes', methods=['POST'])
 def add_like():
     if 'user_id' not in session:
@@ -360,15 +393,16 @@ def remove_like():
 @app.route('/restaurant/<int:restaurant_id>')
 def restaurant(restaurant_id):
     db = sqlite3.connect(DB_PATH)
-    comments = db.execute('SELECT content, created_at, email FROM Comments JOIN users ON Comments.user_id = users.id WHERE restaurant_id = ?',
+    comments = db.execute('SELECT content, created_at, email, Comments.comment_id, Comments.rating, (SELECT COUNT(*) FROM comment_like WHERE comment_id = Comments.comment_id) as like_count FROM Comments JOIN users ON Comments.user_id = users.id WHERE restaurant_id = ?',
                            (restaurant_id,)).fetchall()
     return render_template("restaurant.html", comments=comments, restaurant_id=restaurant_id)
 
 @app.route('/add_comment/<int:restaurant_id>', methods=["POST"])
 def add_comment(restaurant_id):
     comment = request.form.get("new_comment")
+    rating = request.form.get("rating")
     db = sqlite3.connect(DB_PATH)
-    db.execute('INSERT INTO Comments (content, restaurant_id, user_id) VALUES (?, ?, ?)',(comment, restaurant_id, session['user_id']))
+    db.execute('INSERT INTO Comments (content, restaurant_id, user_id, rating) VALUES (?, ?, ?, ?)',(comment, restaurant_id, session['user_id'], rating))
     db.commit()
     return redirect(url_for("restaurant", restaurant_id=restaurant_id))
 

@@ -74,14 +74,24 @@
     <form style="display: none;" action="/add_comment/{{restaurant_id}}" id="comment_form" method="POST">
         <input type="text" name="new_comment" id="add_comment" placeholder="Add Your Comments Here...">
         <button id="comment_b" type="submit">Submit</button>
+        <div id="rate">
+            Rating:
+            <label><input type="radio" name="rating" value="1">⭐️</label>
+            <label><input type="radio" name="rating" value="2">⭐️⭐️</label>
+            <label><input type="radio" name="rating" value="3">⭐️⭐️⭐️</label>
+            <label><input type="radio" name="rating" value="4">⭐️⭐️⭐️⭐️</label>
+            <label><input type="radio" name="rating" value="5">⭐️⭐️⭐️⭐️⭐️</label>
+        </div>
     </form>
 
     <!-- ===== Comments List ===== -->
     {% for comment in comments %}
     <div class="comment_format">
         <p id="user_email">{{comment[2]}}</p>
+        <p id="rating">{{'⭐️' * comment[4] if comment[4] else ''}}</p>
         <p id="content">{{comment[0]}}</p>
         <p id="created_time">{{comment[1]}}</p>
+        <button class="like_button" data-commentid="{{comment[3]}}">🩶<span>{{comment[5]}}</span></button>
     </div>
     {% endfor %}
 

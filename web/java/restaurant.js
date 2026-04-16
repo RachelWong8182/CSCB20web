@@ -50,6 +50,24 @@ button.addEventListener('click', function(event) {
     }
 });
 
+// ==== Comment like button ====
+document.querySelectorAll('.like_button').forEach(button =>{
+    button.addEventListener('click', function(){
+        const commentid = button.dataset.commentid
+        fetch('/api/comment_like/'+ commentid, {method: 'POST'})
+        .then(response => response.json())
+        .then(data =>{
+            button.querySelector('span').innerText = data.number_likes;
+            if(data.liked === true){
+                button.innerHTML = '❤️<span>' + data.number_likes + '</span>';
+            }
+            else{
+                button.innerHTML = '🩶<span>' + data.number_likes + '</span>';
+            }
+        }
+        )
+    })
+})
 
 // ===== Like button =====
 const likeBtn = document.getElementById("detail-like-btn");
