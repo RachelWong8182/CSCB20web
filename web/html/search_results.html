@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Search Results</title>
+    <link rel="stylesheet" href="css/restaurant_listing.css">
+</head>
+
+<body>
+    <nav class="titleline">
+        <a href="/">
+            <button name="logo_button" id="logo-button">
+                <img src="logo.png" alt="home">
+            </button>
+        </a>
+
+        <input id="searchbox" type="search" placeholder="search for a specific restaurant...">
+
+        <button name="manager_button" id="manager-button"> I'm a restaurant manager +</button>
+
+        <button name="likes_button" id="likes-button">
+            <img src="../heart.png" alt="likes">
+        </button>
+
+        <button id="mystore-button" onclick="window.location.href='/my_restaurant.html'" style="display:none;">
+            My Restaurant
+        </button>
+
+        <button onclick="login_popup()" id="login-button">
+            <img src="profile_icon.png" alt="profile">
+        </button>
+
+        <div id="settingMenu" class="setting-menu">
+            <a href="#">Profile</a>
+            <a href="#">Settings</a>
+            <a href="#">Logout</a>
+        </div>
+    </nav>
+
+    <div class="page">
+        <nav class="filter-bar">
+            <button class="filter-btn" data-filter="rating">Rating</button>
+            <button class="filter-btn" data-filter="price">Average Cost</button>
+        </nav>
+
+        <section class="restaurant-list" id="restaurantList"></section>
+    </div>
+
+    <div id="modal-container"></div>
+    <script src="/java/login_window.js"></script>
+    <script src="/java/search_results.js"></script>
+</body>
+</html>

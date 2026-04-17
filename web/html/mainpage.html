@@ -80,5 +80,16 @@
 
 <script src="../java/login_window.js"></script>
 
+<script>
+document.getElementById('searchbox').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+        const value = this.value.trim();
+        if (value) {
+            window.location.href = '/search_results.html?q=' + encodeURIComponent(value);
+        }
+    }
+});
+</script>
+
 </body>
 </html>
