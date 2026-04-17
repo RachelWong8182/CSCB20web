@@ -1,6 +1,4 @@
 /* ===== My Restaurant Page ===== */
-/* Matches mainpage.css style: #fdfbf7 background, #d7d7cb accents, black buttons, border-radius 16px */
-
 .store-page {
     display: flex;
     flex-direction: row;

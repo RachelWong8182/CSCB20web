@@ -521,7 +521,6 @@ def forgot_password():
     conn.close()
 
     if not user:
-        # Don't reveal whether the email exists — always return success
         return jsonify({'success': False, 'message': 'Email not registered.'})
  
     token = secrets.token_urlsafe(32)
@@ -530,8 +529,6 @@ def forgot_password():
         'expires': time.time() + 3600  # 1 hour
     }
  
-    # --- Real app: send an email here ---
-    # For now, print to console so you can test
     print(f"\n[DEV] Password reset token for {email}: {token}\n")
  
     return jsonify({'success': True})
