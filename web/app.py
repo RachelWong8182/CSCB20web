@@ -88,6 +88,10 @@ def manager_required():
 def mainpage():
     return render_template('mainpage.html')
 
+@app.route('/search_results.html')
+def search_results_page():
+    return render_template('search_results.html')
+
 @app.route('/pop_up.html')
 def popup():
     return render_template('pop_up.html')
@@ -254,10 +258,21 @@ def get_restaurants_by_cuisine(cuisine):
     cursor = conn.cursor()
     # Case-insensitive match on cuisine field
     cursor.execute('''
-        SELECT id, name, address, price, hours, description, photo_url
+        SELECT 
+            stores.id,
+            stores.name,
+            stores.address,
+            stores.price,
+            stores.hours,
+            stores.description,
+            stores.photo_url,
+            ROUND(AVG(Comments.rating), 1) as avg_rating
         FROM stores
-        WHERE LOWER(cuisine) = LOWER(?)
+        LEFT JOIN Comments ON stores.id = Comments.restaurant_id
+        WHERE LOWER(stores.cuisine) = LOWER(?)
+        GROUP BY stores.id
     ''', (cuisine,))
+
     rows = cursor.fetchall()
     conn.close()
 
@@ -271,6 +286,51 @@ def get_restaurants_by_cuisine(cuisine):
             'hours':       row[4],
             'description': row[5],
             'photo_url':   row[6],
+            'rating':      row[7] if row[7] is not None else 0
+        })
+
+    return jsonify({'success': True, 'restaurants': restaurants})
+
+@app.route('/api/restaurants/search')
+def search_restaurants():
+    query = request.args.get('q', '').strip()
+
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    cursor.execute('''
+        SELECT 
+            stores.id,
+            stores.name,
+            stores.cuisine,
+            stores.address,
+            stores.price,
+            stores.hours,
+            stores.description,
+            stores.photo_url,
+            ROUND(AVG(Comments.rating), 1) as avg_rating
+        FROM stores
+        LEFT JOIN Comments ON stores.id = Comments.restaurant_id
+        WHERE LOWER(stores.name) LIKE LOWER(?)
+        GROUP BY stores.id
+        ORDER BY avg_rating DESC, stores.name ASC
+    ''', (f'%{query}%',))
+
+    rows = cursor.fetchall()
+    conn.close()
+
+    restaurants = []
+    for row in rows:
+        restaurants.append({
+            'id': row[0],
+            'name': row[1],
+            'cuisine': row[2],
+            'address': row[3],
+            'price': row[4],
+            'hours': row[5],
+            'description': row[6],
+            'photo_url': row[7],
+            'rating': row[8] if row[8] is not None else 0
         })
 
     return jsonify({'success': True, 'restaurants': restaurants})
@@ -349,11 +409,24 @@ def get_likes():
 
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
+
     cursor.execute('''
-        SELECT store_name, cuisine, address, price, hours, description, photo_url
+        SELECT 
+            likes.store_name,
+            likes.cuisine,
+            likes.address,
+            likes.price,
+            likes.hours,
+            likes.description,
+            likes.photo_url,
+            ROUND(AVG(Comments.rating), 1) as avg_rating
         FROM likes
-        WHERE user_id = ?
+        LEFT JOIN stores ON likes.store_name = stores.name
+        LEFT JOIN Comments ON stores.id = Comments.restaurant_id
+        WHERE likes.user_id = ?
+        GROUP BY likes.id
     ''', (session['user_id'],))
+
     rows = cursor.fetchall()
     conn.close()
 
@@ -366,7 +439,8 @@ def get_likes():
             'price': row[3],
             'hours': row[4],
             'description': row[5],
-            'photo_url': row[6]
+            'photo_url': row[6],
+            'rating': row[7] if row[7] is not None else 0
         })
 
     return jsonify({'success': True, 'likes': likes})
