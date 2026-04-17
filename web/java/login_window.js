@@ -175,9 +175,49 @@ function submitRegister(role) {
 
 // ===== Forgot Password: Step 1 — request reset code =====
 function submitForgotPassword() {
+    const email   = document.getElementById('forgot-email').value.trim();
+    const errorEl = document.getElementById('forgot-error');
+    const successEl = document.getElementById('forgot-success');
+
+    errorEl.style.display   = 'none';
+    successEl.style.display = 'none';
+
+    if (!email) {
+        errorEl.textContent = 'Please enter your email.';
+        errorEl.style.display = 'block';
+        return;
+    }
+
+    fetch('/api/forgot_password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            successEl.textContent = 'Reset code sent! Check your email.';
+            successEl.style.display = 'block';
+            // After a short delay, move to step 2
+            setTimeout(() => {
+                hideAllPopups();
+                document.getElementById('reset-password-popup').style.display = 'flex';
+            }, 1500);
+        } else {
+            errorEl.textContent = data.message;
+            errorEl.style.display = 'block';
+        }
+    });
+}
+
+
+// ===== Forgot Password: Step 2 — submit new password =====
+function submitForgotPassword() {
     const email = document.getElementById('forgot-email').value.trim();
     const errorEl = document.getElementById('forgot-error');
     const successEl = document.getElementById('forgot-success');
+
+    if (!errorEl || !successEl) return;  // ← add this safety check
 
     errorEl.style.display = 'none';
     successEl.style.display = 'none';
@@ -196,55 +236,14 @@ function submitForgotPassword() {
     .then(r => r.json())
     .then(data => {
         if (data.success) {
-            successEl.textContent = 'Reset code sent! Check your terminal (dev mode).';
+            successEl.textContent = 'Reset code sent! Check your email.';
             successEl.style.display = 'block';
             setTimeout(() => {
                 hideAllPopups();
                 document.getElementById('reset-password-popup').style.display = 'flex';
             }, 1500);
         } else {
-            errorEl.textContent = data.message || 'Something went wrong.';
-            errorEl.style.display = 'block';
-        }
-    });
-}
-
-
-// ===== Forgot Password: Step 2 — submit new password =====
-function submitResetPassword() {
-    const token = document.getElementById('reset-code').value.trim();
-    const newPassword = document.getElementById('reset-new-password').value.trim();
-    const confirmPassword = document.getElementById('reset-confirm-password').value.trim();
-    const errorEl = document.getElementById('reset-error');
-
-    errorEl.style.display = 'none';
-
-    // ===== Password strength validation =====
-    const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/;
-    if (!passwordPattern.test(newPassword)) {
-        errorEl.textContent = 'Password must be at least 6 characters and include an uppercase letter, a lowercase letter, and a number.';
-        errorEl.style.display = 'block';
-        return;
-    }
-
-    if (newPassword !== confirmPassword) {
-        errorEl.textContent = 'Passwords do not match.';
-        errorEl.style.display = 'block';
-        return;
-    }
-
-    fetch('/api/reset_password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token, new_password: newPassword, confirm_password: confirmPassword })
-    })
-    .then(r => r.json())
-    .then(data => {
-        if (data.success) {
-            hideAllPopups();
-            document.getElementById('login-popup').style.display = 'flex';
-        } else {
-            errorEl.textContent = data.message || 'Something went wrong.';
+            errorEl.textContent = data.message || 'Something went wrong.';  // ← fallback
             errorEl.style.display = 'block';
         }
     });
