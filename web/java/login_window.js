@@ -146,6 +146,14 @@ function submitRegister(role) {
     const confirm = document.getElementById(`${prefix}-confirm`).value.trim();
     const errorEl = document.getElementById(`${prefix}-error`);
 
+    // ===== Password strength validation =====
+    const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/;
+    if (!passwordPattern.test(password)) {
+        errorEl.textContent = 'Password must be at least 6 characters and include an uppercase letter, a lowercase letter, and a number.';
+        errorEl.style.display = 'block';
+        return;
+    }
+
     fetch('/api/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
